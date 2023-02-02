@@ -5,7 +5,7 @@
         xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
         xmlns:v="clr-namespace:MylangSharp.Views"
         xmlns:vm="clr-namespace:MylangSharp.ViewModels"
-        Title="MainWindow" FontSize="14" Width="600" Height="400">
+        Title="MainWindow" FontSize="14" Width="625" MinWidth="625" Height="425" MinHeight="425">
 
 	<Window.DataContext>
 		<vm:MainWindowViewModel />
@@ -26,17 +26,41 @@
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="1*"/>
+			<RowDefinition Height="0.6*"/>
 		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="1*"/>
+			<ColumnDefinition Width="0.5*"/>
+		</Grid.ColumnDefinitions>
 
-		<Menu FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
+		<Menu FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Grid.ColumnSpan="2">
 			<MenuItem Header="ファイル(_F)">
 				<MenuItem Header="開く(_O)"/>
 				<MenuItem Header="名前を付けて保存(_A)"/>
 				<MenuItem Header="上書き保存(_S)"/>
 			</MenuItem>
+			<MenuItem Header="実行(_R)">
+			</MenuItem>
 		</Menu>
-		
-		
+
+		<TextBox Text="{Binding SourceCodeString}" VerticalScrollBarVisibility="Auto" Grid.Row="1"/>
+		<TextBlock Text="mylangソースコード" Opacity=".5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Grid.Row="1"/>
+
+		<ListView ItemsSource="{Binding Variables}" Grid.Row="2">
+			<ListView.View>
+				<GridView>
+					<GridViewColumn Header="変数名" DisplayMemberBinding="{Binding Name}" Width="175"/>
+					<GridViewColumn Header="変数値" DisplayMemberBinding="{Binding Value}" Width="175"/>
+				</GridView>
+			</ListView.View>
+		</ListView>
+
+		<TextBox Text="{Binding Output, Mode=OneWay}" VerticalScrollBarVisibility="Auto" Grid.Row="1" Grid.Column="1"/>
+		<TextBlock Text="出力" Opacity=".5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Grid.Row="1" Grid.Column="1"/>
+
+		<TextBox Text="{Binding StackString, Mode=OneWay}" VerticalScrollBarVisibility="Auto" Grid.Row="2" Grid.Column="1"/>
+		<TextBlock Text="スタック" Opacity=".5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Grid.Row="2" Grid.Column="1"/>
 
 	</Grid>
 	
