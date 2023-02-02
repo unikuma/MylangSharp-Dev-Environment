@@ -5,7 +5,7 @@
         xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
         xmlns:v="clr-namespace:MylangSharp.Views"
         xmlns:vm="clr-namespace:MylangSharp.ViewModels"
-        Title="MainWindow" FontSize="14" Width="625" MinWidth="625" Height="425" MinHeight="425">
+        Title="{Binding WindowTitle}" FontSize="14" Width="625" MinWidth="625" Height="425" MinHeight="425">
 
 	<Window.DataContext>
 		<vm:MainWindowViewModel />
@@ -21,6 +21,30 @@
 			<l:DataContextDisposeAction />
 		</behaviors:EventTrigger>
 
+		<behaviors:KeyTrigger Modifiers="Ctrl" Key="O">
+			<l:OpenFileDialogInteractionMessageAction>
+				<l:DirectInteractionMessage CallbackMethodName="OpenFileDialogFunc" CallbackMethodTarget="{Binding}">
+					<l:OpeningFileSelectionMessage Filter="mylangソースファイル(*.mylang)|*.mylang" Title="ファイルを開く"/>
+				</l:DirectInteractionMessage>
+			</l:OpenFileDialogInteractionMessageAction>
+		</behaviors:KeyTrigger>
+
+		<behaviors:KeyTrigger Modifiers="Ctrl+Shift" Key="S">
+			<l:SaveFileDialogInteractionMessageAction>
+				<l:DirectInteractionMessage CallbackMethodName="SaveFileDialogFunc" CallbackMethodTarget="{Binding}">
+					<l:SavingFileSelectionMessage Filter="mylangソースファイル(*.mylang)|*.mylang" Title="ファイルを保存" OverwritePrompt="True"/>
+				</l:DirectInteractionMessage>
+			</l:SaveFileDialogInteractionMessageAction>
+		</behaviors:KeyTrigger>
+
+		<behaviors:KeyTrigger Modifiers="Ctrl" Key="S">
+			<l:LivetCallMethodAction MethodName="OverrideSaveFunc" MethodTarget="{Binding}"/>
+		</behaviors:KeyTrigger>
+		
+		<l:InteractionMessageTrigger MessageKey="SaveDialog" Messenger="{Binding Messenger}">
+			<l:SaveFileDialogInteractionMessageAction/>
+		</l:InteractionMessageTrigger>
+		
 	</behaviors:Interaction.Triggers>
 
 	<Grid>
@@ -36,15 +60,68 @@
 
 		<Menu FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Grid.ColumnSpan="2">
 			<MenuItem Header="ファイル(_F)">
-				<MenuItem Header="開く(_O)"/>
-				<MenuItem Header="名前を付けて保存(_A)"/>
-				<MenuItem Header="上書き保存(_S)"/>
+				<MenuItem Header="開く(_O)" InputGestureText="Ctrl+O">
+					<behaviors:Interaction.Triggers>
+						<behaviors:EventTrigger EventName="Click">
+							<l:OpenFileDialogInteractionMessageAction>
+								<l:DirectInteractionMessage CallbackMethodName="OpenFileDialogFunc" CallbackMethodTarget="{Binding}">
+									<l:OpeningFileSelectionMessage Filter="mylangソースファイル(*.mylang)|*.mylang" Title="ファイルを開く"/>
+								</l:DirectInteractionMessage>
+							</l:OpenFileDialogInteractionMessageAction>
+						</behaviors:EventTrigger>
+					</behaviors:Interaction.Triggers>
+				</MenuItem>
+				<MenuItem Header="名前を付けて保存(_A)" InputGestureText="Ctrl+Shift+S">
+					<behaviors:Interaction.Triggers>
+						<behaviors:EventTrigger EventName="Click">
+							<l:SaveFileDialogInteractionMessageAction>
+								<l:DirectInteractionMessage CallbackMethodName="SaveFileDialogFunc" CallbackMethodTarget="{Binding}">
+									<l:SavingFileSelectionMessage Filter="mylangソースファイル(*.mylang)|*.mylang" Title="ファイルを保存" OverwritePrompt="True"/>
+								</l:DirectInteractionMessage>
+							</l:SaveFileDialogInteractionMessageAction>
+						</behaviors:EventTrigger>
+					</behaviors:Interaction.Triggers>
+				</MenuItem>
+				<MenuItem Header="上書き保存(_S)" InputGestureText="Ctrl+S">
+					<behaviors:Interaction.Triggers>
+						<behaviors:EventTrigger EventName="Click">
+							<l:LivetCallMethodAction MethodName="OverrideSaveFunc" MethodTarget="{Binding}"/>
+						</behaviors:EventTrigger>
+					</behaviors:Interaction.Triggers>
+				</MenuItem>
 			</MenuItem>
-			<MenuItem Header="実行(_R)">
+			<MenuItem Header="実行(_R)" InputGestureText="F5">
+				<behaviors:Interaction.Triggers>
+					<behaviors:EventTrigger EventName="Click">
+						<l:LivetCallMethodAction MethodName="RunSourceCode" MethodTarget="{Binding}"/>
+					</behaviors:EventTrigger>
+				</behaviors:Interaction.Triggers>
+			</MenuItem>
+			<MenuItem Header="コンソール">
+				<MenuItem Header="コンソールの割当">
+					<behaviors:Interaction.Triggers>
+						<behaviors:EventTrigger EventName="Click">
+							<l:LivetCallMethodAction MethodName="ShowConsole" MethodTarget="{Binding}"/>
+						</behaviors:EventTrigger>
+					</behaviors:Interaction.Triggers>
+				</MenuItem>
+				<MenuItem Header="コンソールの解放">
+					<behaviors:Interaction.Triggers>
+						<behaviors:EventTrigger EventName="Click">
+							<l:LivetCallMethodAction MethodName="HideConsole" MethodTarget="{Binding}"/>
+						</behaviors:EventTrigger>
+					</behaviors:Interaction.Triggers>
+				</MenuItem>
 			</MenuItem>
 		</Menu>
 
-		<TextBox Text="{Binding SourceCodeString}" VerticalScrollBarVisibility="Auto" Grid.Row="1"/>
+		<TextBox Text="{Binding SourceCode, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Grid.Row="1">
+			<behaviors:Interaction.Triggers>
+				<behaviors:EventTrigger EventName="TextChanged">
+					<l:LivetCallMethodAction MethodName="SourceCodeTextChanged" MethodTarget="{Binding}"/>
+				</behaviors:EventTrigger>
+			</behaviors:Interaction.Triggers>
+		</TextBox>
 		<TextBlock Text="mylangソースコード" Opacity=".5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Grid.Row="1"/>
 
 		<ListView ItemsSource="{Binding Variables}" Grid.Row="2">
@@ -56,10 +133,10 @@
 			</ListView.View>
 		</ListView>
 
-		<TextBox Text="{Binding Output, Mode=OneWay}" VerticalScrollBarVisibility="Auto" Grid.Row="1" Grid.Column="1"/>
+		<TextBox Text="{Binding Output, Mode=OneWay}" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Grid.Row="1" Grid.Column="1"/>
 		<TextBlock Text="出力" Opacity=".5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Grid.Row="1" Grid.Column="1"/>
 
-		<TextBox Text="{Binding StackString, Mode=OneWay}" VerticalScrollBarVisibility="Auto" Grid.Row="2" Grid.Column="1"/>
+		<TextBox Text="{Binding StackString, Mode=OneWay}" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Grid.Row="2" Grid.Column="1"/>
 		<TextBlock Text="スタック" Opacity=".5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Grid.Row="2" Grid.Column="1"/>
 
 	</Grid>
