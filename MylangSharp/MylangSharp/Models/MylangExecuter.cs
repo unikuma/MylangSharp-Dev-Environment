@@ -2,7 +2,6 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace MylangSharp.Models
 {
@@ -22,6 +21,17 @@ namespace MylangSharp.Models
 		private int progcnt = 0;
 
 		private string inbuf = string.Empty;
+
+		public Func<string> OpenInputFunc { get; set; }
+
+		private string _PutString = string.Empty;
+		public string PutString
+		{
+			get => _PutString;
+			set => RaisePropertyChangedIfSet(ref _PutString, value);
+		}
+
+		public Action<string> OpenOutputFunc { get; set; }
 
 		private string _Output;
 		public string Output
@@ -56,11 +66,11 @@ namespace MylangSharp.Models
 			{
 				Initialize();
 
-				program = program.Replace("\r\n", " ");
+				program = System.Text.RegularExpressions.Regex.Replace(program, @"\r\n|\n|\r\n", " ");
 				program = program.Replace("\t", " ");
 				program = program.Replace("  ", " ");
 
-				elem = program.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
+				elem = program.Split(' ').Where(s => !string.IsNullOrEmpty(s)).ToArray();
 				elemCount = elem.Length;
 			}
 
@@ -214,7 +224,7 @@ namespace MylangSharp.Models
 					{
 						Mes("これは.getchar、なので入力を受け取る");
 						if (inbuf.Length == 0)
-							inbuf = "test" + "\r\n";
+							inbuf = OpenInputFunc() + "\r\n";
 						else
 						{
 							// 入力バッファに文字が残っている
@@ -225,8 +235,7 @@ namespace MylangSharp.Models
 					else if (elem[progcnt] == ".putchar")
 					{
 						Mes("これは.putchar、なので出力する");
-						Console.Write(Convert.ToChar(stack[--stackIndex]));
-						
+						PutString += Convert.ToChar(stack[--stackIndex]);
 					}
 					else if (elem[progcnt] == ".env-version")
 					{
@@ -432,7 +441,7 @@ namespace MylangSharp.Models
 				Variables[i] = new Variable();
 
 			stackIndex = callStackIndex = progcnt = 0;
-			Output = inbuf = string.Empty;
+			Output = inbuf = PutString = string.Empty;
 		}
 	}
 }
