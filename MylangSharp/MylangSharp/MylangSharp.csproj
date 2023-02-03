@@ -4,6 +4,10 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <AssemblyName>MSDE</AssemblyName>
+    <Authors>$(AssemblyName) / unikuma</Authors>
+    <Company></Company>
+    <Copyright>Copyright (c) 2023 unikuma</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

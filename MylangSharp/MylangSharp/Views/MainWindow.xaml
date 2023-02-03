@@ -13,6 +13,18 @@
 
 	<behaviors:Interaction.Triggers>
 
+		<l:InteractionMessageTrigger MessageKey="SaveDialog" Messenger="{Binding Messenger}">
+			<l:SaveFileDialogInteractionMessageAction/>
+		</l:InteractionMessageTrigger>
+
+		<l:InteractionMessageTrigger MessageKey="OpenInputFunc" Messenger="{Binding Messenger}">
+			<l:TransitionInteractionMessageAction/>
+		</l:InteractionMessageTrigger>
+
+		<l:InteractionMessageTrigger MessageKey="OpenOutputFunc" Messenger="{Binding Messenger}">
+			<l:TransitionInteractionMessageAction/>
+		</l:InteractionMessageTrigger>
+
 		<behaviors:EventTrigger EventName="ContentRendered">
 			<l:LivetCallMethodAction MethodName="Initialize" MethodTarget="{Binding}" />
 		</behaviors:EventTrigger>
@@ -41,9 +53,9 @@
 			<l:LivetCallMethodAction MethodName="OverrideSaveFunc" MethodTarget="{Binding}"/>
 		</behaviors:KeyTrigger>
 		
-		<l:InteractionMessageTrigger MessageKey="SaveDialog" Messenger="{Binding Messenger}">
-			<l:SaveFileDialogInteractionMessageAction/>
-		</l:InteractionMessageTrigger>
+		<behaviors:KeyTrigger Key="F5">
+			<l:LivetCallMethodAction MethodName="RunSourceCode" MethodTarget="{Binding}"/>
+		</behaviors:KeyTrigger>
 		
 	</behaviors:Interaction.Triggers>
 
@@ -89,6 +101,8 @@
 						</behaviors:EventTrigger>
 					</behaviors:Interaction.Triggers>
 				</MenuItem>
+				<!--<Separator/>
+				<MenuItem Header="mylangファイルの追加"/>-->
 			</MenuItem>
 			<MenuItem Header="実行(_R)" InputGestureText="F5">
 				<behaviors:Interaction.Triggers>
@@ -117,11 +131,29 @@
 			</ListView.View>
 		</ListView>
 
-		<TextBox Text="{Binding Output, Mode=OneWay}" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Grid.Row="1" Grid.Column="1"/>
-		<TextBlock Text="出力" Opacity=".5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Grid.Row="1" Grid.Column="1"/>
+		<Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="1">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="1*"/>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="0.5*"/>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="0.5*"/>
+			</Grid.RowDefinitions>
+			
+			<TextBox Text="{Binding Output, Mode=OneWay}" IsReadOnly="True" VerticalScrollBarVisibility="Auto"/>
+			<TextBlock Text="出力" Opacity=".5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5"/>
 
-		<TextBox Text="{Binding StackString, Mode=OneWay}" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Grid.Row="2" Grid.Column="1"/>
-		<TextBlock Text="スタック" Opacity=".5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Grid.Row="2" Grid.Column="1"/>
+			<GridSplitter Height="5" Grid.Row="1" HorizontalAlignment="Stretch"/>
+
+			<TextBox Text="{Binding StackString, Mode=OneWay}" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Grid.Row="2"/>
+			<TextBlock Text="スタック" Opacity=".5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Grid.Row="2"/>
+
+			<GridSplitter Height="5" Grid.Row="3" HorizontalAlignment="Stretch"/>
+			
+			<TextBox Text="{Binding PutString, Mode=OneWay}" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Grid.Row="4"/>
+			<TextBlock Text=".putchar" Opacity=".5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Grid.Row="4"/>
+			
+		</Grid>
 
 	</Grid>
 	

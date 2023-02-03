@@ -27,20 +27,13 @@ namespace MylangSharp.ViewModels
 			set => RaisePropertyChangedIfSet(ref _SourceCode, value);
 		}
 
-		public string StackString
-		{
-			get => mylangExe.StackString;
-		}
+		public string StackString => mylangExe.StackString;
 
-		public string Output
-		{
-			get => mylangExe.Output;
-		}
+		public string Output => mylangExe.Output;
 
-		public ObservableCollection<Variable> Variables
-		{
-			get => mylangExe.Variables;
-		}
+		public ObservableCollection<Variable> Variables => mylangExe.Variables;
+
+		public string PutString => mylangExe.PutString;
 
 		private string _WindowTitle = "MylangSharp Dev Environment";
 		public string WindowTitle
@@ -57,11 +50,13 @@ namespace MylangSharp.ViewModels
 		// バインディングメソッド
 		public void Initialize()
 		{
+			mylangExe.OpenInputFunc = OpenInputFunc;
 			var listener = new PropertyChangedEventListener(mylangExe)
 			{
 				{ nameof(mylangExe.StackString), (_, __) => RaisePropertyChanged(nameof(StackString)) },
 				{ nameof(mylangExe.Output), (_, __) => RaisePropertyChanged(nameof(Output)) },
 				{ nameof(mylangExe.Variables), (_, __) => RaisePropertyChanged(nameof(Variables)) },
+				{ nameof(mylangExe.PutString), (_, __) => RaisePropertyChanged(nameof(PutString)) },
 			};
 			oldSourceCode = SourceCode;
 		}
@@ -133,6 +128,15 @@ namespace MylangSharp.ViewModels
 		{
 			isChanged = (SourceCode != oldSourceCode);
 			WindowTitle = isChanged ? "MylangSharp Dev Environment *" : "MylangSharp Dev Environment";
+		}
+
+		public string OpenInputFunc()
+		{
+			var vmodel = new InputWindowViewModel();
+			var message = new TransitionMessage(typeof(Views.InputWindow), vmodel, TransitionMode.Modal, "OpenInputFunc");
+			Messenger.Raise(message);
+
+			return vmodel.Input;
 		}
 	}
 }
