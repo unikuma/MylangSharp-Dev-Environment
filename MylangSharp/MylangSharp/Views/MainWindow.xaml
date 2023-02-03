@@ -97,22 +97,6 @@
 					</behaviors:EventTrigger>
 				</behaviors:Interaction.Triggers>
 			</MenuItem>
-			<MenuItem Header="コンソール">
-				<MenuItem Header="コンソールの割当">
-					<behaviors:Interaction.Triggers>
-						<behaviors:EventTrigger EventName="Click">
-							<l:LivetCallMethodAction MethodName="ShowConsole" MethodTarget="{Binding}"/>
-						</behaviors:EventTrigger>
-					</behaviors:Interaction.Triggers>
-				</MenuItem>
-				<MenuItem Header="コンソールの解放">
-					<behaviors:Interaction.Triggers>
-						<behaviors:EventTrigger EventName="Click">
-							<l:LivetCallMethodAction MethodName="HideConsole" MethodTarget="{Binding}"/>
-						</behaviors:EventTrigger>
-					</behaviors:Interaction.Triggers>
-				</MenuItem>
-			</MenuItem>
 		</Menu>
 
 		<TextBox Text="{Binding SourceCode, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Grid.Row="1">

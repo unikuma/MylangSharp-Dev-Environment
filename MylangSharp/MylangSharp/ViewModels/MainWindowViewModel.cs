@@ -17,7 +17,7 @@ using System.IO;
 
 namespace MylangSharp.ViewModels
 {
-	public class MainWindowViewModel : ViewModel, IDisposable
+	public class MainWindowViewModel : ViewModel
 	{
 		// バインディングプロパティ
 		private string _SourceCode = "1 2 +";
@@ -52,7 +52,7 @@ namespace MylangSharp.ViewModels
 		private MylangExecuter mylangExe = new MylangExecuter();
 
 		private string oldSourceCode, currentFile;
-		private bool isChanged, isConsoleAlloc;
+		private bool isChanged;
 
 		// バインディングメソッド
 		public void Initialize()
@@ -134,35 +134,5 @@ namespace MylangSharp.ViewModels
 			isChanged = (SourceCode != oldSourceCode);
 			WindowTitle = isChanged ? "MylangSharp Dev Environment *" : "MylangSharp Dev Environment";
 		}
-
-		public void ShowConsole()
-		{
-			if (!isConsoleAlloc)
-			{
-				isConsoleAlloc = AllocConsole();
-				Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
-			}
-		}
-
-		public void HideConsole()
-		{
-			if (isConsoleAlloc)
-			{
-				FreeConsole();
-				isConsoleAlloc = false;
-			}
-		}
-
-		public new void Dispose()
-		{
-			if (isConsoleAlloc)
-				FreeConsole();
-		}
-
-		[DllImport("kernel32.dll")]
-		private static extern bool AllocConsole();
-
-		[DllImport("kernel32.dll")]
-		private static extern bool FreeConsole();
 	}
 }

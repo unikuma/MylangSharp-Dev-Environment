@@ -214,7 +214,7 @@ namespace MylangSharp.Models
 					{
 						Mes("これは.getchar、なので入力を受け取る");
 						if (inbuf.Length == 0)
-							inbuf = Console.ReadLine() + "\r\n";
+							inbuf = "test" + "\r\n";
 						else
 						{
 							// 入力バッファに文字が残っている
@@ -226,6 +226,7 @@ namespace MylangSharp.Models
 					{
 						Mes("これは.putchar、なので出力する");
 						Console.Write(Convert.ToChar(stack[--stackIndex]));
+						
 					}
 					else if (elem[progcnt] == ".env-version")
 					{
