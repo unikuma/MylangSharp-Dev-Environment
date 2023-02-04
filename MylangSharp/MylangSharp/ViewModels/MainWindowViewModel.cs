@@ -1,23 +1,18 @@
 ﻿using Livet;
-using Livet.Commands;
 using Livet.EventListeners;
 using Livet.Messaging;
 using Livet.Messaging.IO;
-using Livet.Messaging.Windows;
 using MylangSharp.Models;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.InteropServices;
+using System.IO;
 using System.Text;
 using System.Windows;
-using System.IO;
+using System.Xml.Serialization;
 
 namespace MylangSharp.ViewModels
 {
-	public class MainWindowViewModel : ViewModel
+	public class MainWindowViewModel : ViewModel, IDisposable
 	{
 		// バインディングプロパティ
 		private string _SourceCode = "1 2 +";
@@ -46,10 +41,12 @@ namespace MylangSharp.ViewModels
 
 		private string oldSourceCode, currentFile;
 		private bool isChanged;
+		private AppSettings appSetting = new AppSettings();
 
 		// バインディングメソッド
 		public void Initialize()
 		{
+			Deserialize();
 			mylangExe.OpenInputFunc = OpenInputFunc;
 			var listener = new PropertyChangedEventListener(mylangExe)
 			{
@@ -67,7 +64,19 @@ namespace MylangSharp.ViewModels
 			try
 			{
 				if (!string.IsNullOrWhiteSpace(SourceCode))
-					mylangExe.Run(SourceCode);
+				{
+					string importMylang = string.Empty;
+					foreach (ImportFile importFile in appSetting.ImportFiles)
+					{
+						if (File.Exists(importFile.ToString()))
+						{
+							Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+							importMylang += File.ReadAllText(importFile.ToString(), Encoding.GetEncoding("shift_jis")) + " ";
+						}
+					}
+
+					mylangExe.Run(importMylang + SourceCode);
+				}
 				else
 					MessageBox.Show("ソースコードがnullか空白、空文字です", "MLGDE", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
@@ -137,6 +146,43 @@ namespace MylangSharp.ViewModels
 			Messenger.Raise(message);
 
 			return vmodel.Input;
+		}
+
+		public void OpenImportMylang()
+		{
+			var vmodel = new ImportMylangWindowViewModel()
+			{
+				ImportFiles = appSetting.ImportFiles,
+			};
+			var message = new TransitionMessage(typeof(Views.ImportMylangWindow), vmodel, TransitionMode.Modal, "OpenImportMylang");
+			Messenger.Raise(message);
+		}
+
+		public new void Dispose()
+		{
+			Serialize();
+		}
+
+		// プライベートメンバ
+		private void Serialize()
+		{
+			XmlSerializer xml = new XmlSerializer(appSetting.GetType());
+			using (StreamWriter stw = new StreamWriter("AppSettings.xml", append: false, new UTF8Encoding(false)))
+			{
+				xml.Serialize(stw, appSetting ?? new AppSettings());
+			}
+		}
+
+		public void Deserialize()
+		{
+			if (File.Exists("AppSettings.xml"))
+			{
+				XmlSerializer xml = new XmlSerializer(appSetting.GetType());
+				using (StreamReader str = new StreamReader("AppSettings.xml", new UTF8Encoding(false)))
+				{
+					appSetting = (xml.Deserialize(str) as AppSettings) ?? new AppSettings();
+				}
+			}
 		}
 	}
 }

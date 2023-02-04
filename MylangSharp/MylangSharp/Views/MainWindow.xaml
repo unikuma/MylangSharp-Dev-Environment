@@ -21,7 +21,7 @@
 			<l:TransitionInteractionMessageAction/>
 		</l:InteractionMessageTrigger>
 
-		<l:InteractionMessageTrigger MessageKey="OpenOutputFunc" Messenger="{Binding Messenger}">
+		<l:InteractionMessageTrigger MessageKey="OpenImportMylang" Messenger="{Binding Messenger}">
 			<l:TransitionInteractionMessageAction/>
 		</l:InteractionMessageTrigger>
 
@@ -101,8 +101,14 @@
 						</behaviors:EventTrigger>
 					</behaviors:Interaction.Triggers>
 				</MenuItem>
-				<!--<Separator/>
-				<MenuItem Header="mylangファイルの追加"/>-->
+				<Separator/>
+				<MenuItem Header="mylangファイルのインポート">
+					<behaviors:Interaction.Triggers>
+						<behaviors:EventTrigger EventName="Click">
+							<l:LivetCallMethodAction MethodName="OpenImportMylang" MethodTarget="{Binding}"/>
+						</behaviors:EventTrigger>
+					</behaviors:Interaction.Triggers>
+				</MenuItem>
 			</MenuItem>
 			<MenuItem Header="実行(_R)" InputGestureText="F5">
 				<behaviors:Interaction.Triggers>
